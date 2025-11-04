@@ -7,7 +7,7 @@ const pacienteSchema = new mongoose.Schema({
   endereco: { type: String },
   telefone: { type: String },
   genero: { type: String, enum: ['Masculino', 'Feminino', 'Outro'] },
-  email: { type: String },
+  email: { type: String },  
   historicoVacinas: [{
     vacina: { type: mongoose.Schema.Types.ObjectId, ref: 'Vacina' },
     dataAplicacao: { type: Date },
