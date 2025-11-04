@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* Fundo global escuro */
+html, body, #root {
+  @apply bg-[#0f172a] min-h-screen;
+}
+
+@layer components {
+  .input {
+    @apply w-full px-4 py-2.5 bg-[#1e293b] border border-[#334155] rounded-md 
+    text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 
+    transition;
+  }
+}
