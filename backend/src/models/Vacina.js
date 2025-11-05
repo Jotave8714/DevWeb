@@ -8,7 +8,8 @@ const vacinaSchema = new mongoose.Schema({
   intervalosDias: { type: Number }, // array de intervalos entre doses
   reforco: { type: String }, // informações sobre reforço
   pubaAlvo: { type: String }, // público alvo
-  validade: { type: Date }
+  validade: { type: Date },
+  status: { type: String, enum: ['Ativa', 'Vencendo', 'Inativa'], default: 'Ativa' },
 }, { timestamps: true });
 
 export default mongoose.model('Vacina', vacinaSchema);

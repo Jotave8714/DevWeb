@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
+import API from "../api";
 
-export default function ModalNovaVacina({ onClose }) {
+export default function ModalNovaVacina({ onClose, onSuccess }) {
   const [form, setForm] = useState({
     nome: "",
     fabricante: "",
@@ -9,170 +10,96 @@ export default function ModalNovaVacina({ onClose }) {
     validade: "",
     doses: "",
     intervalo: "",
-    reforco: "",
-    publico: "Todos",
+    publico: "",
+    status: "Ativa",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Vacina cadastrada com sucesso! (simulação visual)");
-    onClose();
+    setLoading(true);
+    try {
+      await API.post("/vacinas", form);
+      alert("Vacina cadastrada com sucesso!");
+      onSuccess(); // 🔁 atualiza lista
+      onClose();
+    } catch (err) {
+      console.error("Erro ao cadastrar vacina:", err);
+      alert("Erro ao cadastrar vacina!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
-      <div className="bg-[#111827] border border-[#1f2937] rounded-2xl p-8 w-full max-w-md shadow-xl relative">
-        {/* Botão de fechar */}
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+      <div className="bg-[#111827] rounded-xl p-6 w-full max-w-lg border border-[#1f2937] relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-200 transition"
+          className="absolute top-3 right-3 text-gray-400 hover:text-white"
         >
           <X size={20} />
         </button>
 
-        {/* Título */}
-        <h2 className="text-xl font-semibold text-white mb-6">Nova Vacina</h2>
+        <h2 className="text-xl font-semibold text-white mb-4">
+          Cadastrar Nova Vacina
+        </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Nome e Fabricante */}
-          <div>
-            <label className="block text-sm text-gray-300 mb-1">
-              Nome da Vacina
-            </label>
-            <input
-              type="text"
-              name="nome"
-              value={form.nome}
-              onChange={handleChange}
-              placeholder="Ex: COVID-19 Pfizer"
-              className="w-full bg-[#1e293b] text-gray-200 rounded-md px-3 py-2 border border-[#334155] focus:ring-2 focus:ring-green-500 outline-none"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm text-gray-300 mb-1">
-              Fabricante
-            </label>
-            <input
-              type="text"
-              name="fabricante"
-              value={form.fabricante}
-              onChange={handleChange}
-              placeholder="Ex: Pfizer"
-              className="w-full bg-[#1e293b] text-gray-200 rounded-md px-3 py-2 border border-[#334155] focus:ring-2 focus:ring-green-500 outline-none"
-            />
-          </div>
-
-          {/* Lote e Validade */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">
-                Lote Padrão
-              </label>
+        <form onSubmit={handleSubmit} className="space-y-4 text-sm">
+          {[
+            { label: "Nome", name: "nome" },
+            { label: "Fabricante", name: "fabricante" },
+            { label: "Lote", name: "lote" },
+            { label: "Validade", name: "validade", type: "date" },
+            { label: "Doses", name: "doses" },
+            { label: "Intervalo", name: "intervalo" },
+            { label: "Público", name: "publico" },
+          ].map((f) => (
+            <div key={f.name}>
+              <label className="block text-gray-400 mb-1">{f.label}</label>
               <input
-                type="text"
-                name="lote"
-                value={form.lote}
+                type={f.type || "text"}
+                name={f.name}
+                value={form[f.name]}
                 onChange={handleChange}
-                placeholder="Ex: PF001"
-                className="w-full bg-[#1e293b] text-gray-200 rounded-md px-3 py-2 border border-[#334155] focus:ring-2 focus:ring-green-500 outline-none"
+                required
+                className="w-full bg-[#1e293b] border border-[#334155] rounded-md px-3 py-2 text-gray-200 focus:ring-2 focus:ring-green-500"
               />
             </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">
-                Validade
-              </label>
-              <input
-                type="date"
-                name="validade"
-                value={form.validade}
-                onChange={handleChange}
-                className="w-full bg-[#1e293b] text-gray-200 rounded-md px-3 py-2 border border-[#334155] focus:ring-2 focus:ring-green-500 outline-none"
-              />
-            </div>
-          </div>
+          ))}
 
-          {/* Doses e Intervalo */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">
-                Nº de Doses
-              </label>
-              <input
-                type="number"
-                name="doses"
-                value={form.doses}
-                onChange={handleChange}
-                placeholder="Ex: 2"
-                className="w-full bg-[#1e293b] text-gray-200 rounded-md px-3 py-2 border border-[#334155] focus:ring-2 focus:ring-green-500 outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">
-                Intervalo (dias)
-              </label>
-              <input
-                type="number"
-                name="intervalo"
-                value={form.intervalo}
-                onChange={handleChange}
-                placeholder="Ex: 21"
-                className="w-full bg-[#1e293b] text-gray-200 rounded-md px-3 py-2 border border-[#334155] focus:ring-2 focus:ring-green-500 outline-none"
-              />
-            </div>
-          </div>
-
-          {/* Critérios de Reforço */}
           <div>
-            <label className="block text-sm text-gray-300 mb-1">
-              Critérios de Reforço
-            </label>
-            <textarea
-              name="reforco"
-              value={form.reforco}
-              onChange={handleChange}
-              placeholder="Ex: Reforço após 6 meses"
-              className="w-full bg-[#1e293b] text-gray-200 rounded-md px-3 py-2 border border-[#334155] h-20 resize-none focus:ring-2 focus:ring-green-500 outline-none"
-            />
-          </div>
-
-          {/* Público-Alvo */}
-          <div>
-            <label className="block text-sm text-gray-300 mb-1">
-              Público-Alvo
-            </label>
+            <label className="block text-gray-400 mb-1">Status</label>
             <select
-              name="publico"
-              value={form.publico}
+              name="status"
+              value={form.status}
               onChange={handleChange}
-              className="w-full bg-[#1e293b] text-gray-200 rounded-md px-3 py-2 border border-[#334155] focus:ring-2 focus:ring-green-500 outline-none"
+              className="w-full bg-[#1e293b] border border-[#334155] rounded-md px-3 py-2 text-gray-200 focus:ring-2 focus:ring-green-500"
             >
-              <option>Todos</option>
-              <option>Adultos</option>
-              <option>Estudantes</option>
-              <option>Profissionais da Saúde</option>
+              <option>Ativa</option>
+              <option>Vencendo</option>
+              <option>Inativa</option>
             </select>
           </div>
 
-          {/* Botões */}
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex justify-end gap-3 mt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 rounded-md bg-gray-600 hover:bg-gray-500 text-gray-200 font-medium transition"
+              className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-md transition"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-md bg-green-500 hover:bg-green-600 text-white font-medium transition"
+              disabled={loading}
+              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition"
             >
-              Salvar
+              {loading ? "Salvando..." : "Cadastrar"}
             </button>
           </div>
         </form>

@@ -1,21 +1,51 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Phone, Mail, MapPin, ShieldCheck, AlertCircle, Syringe } from "lucide-react";
+import { User, Phone, Mail, MapPin, ShieldCheck, AlertCircle, Syringe, ArrowLeft } from "lucide-react";
+import API from "../api";
 
 export default function PacienteDetalhes() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const [paciente, setPaciente] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPaciente = async () => {
+      try {
+        const res = await API.get(`/pacientes/${id}`);
+        setPaciente(res.data);
+      } catch (err) {
+        console.error("Erro ao buscar paciente:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPaciente();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-400 bg-[#0b1120]">
+        Carregando informações do paciente...
+      </div>
+    );
+  }
+
+  if (!paciente) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-400 bg-[#0b1120]">
+        Paciente não encontrado.
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-[#0b1120] text-gray-200">
-      {/* Barra lateral */}
       <Sidebar />
-
-      {/* Conteúdo principal */}
       <div className="flex-1 flex flex-col">
         <Header />
-
         <main className="p-8 space-y-8 relative">
           {/* 🔙 Botão de Voltar */}
           <button
@@ -26,32 +56,35 @@ export default function PacienteDetalhes() {
             <span className="text-sm font-medium">Voltar</span>
           </button>
 
-          {/* Espaço extra abaixo do botão */}
           <div className="mt-10"></div>
 
-          {/* Informações principais do paciente */}
+          {/* Card principal */}
           <div className="bg-[#111827] border border-[#1f2937] rounded-xl p-6 flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-4">
               <div className="bg-green-500/10 p-3 rounded-full">
                 <User className="text-green-400" size={28} />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-white">Maria Silva Santos</h2>
+                <h2 className="text-xl font-semibold text-white">{paciente.nome}</h2>
                 <p className="text-gray-400 text-sm">
-                  45 anos • Feminino • CPF: 123.456.789-00
+                  {paciente.idade ? `${paciente.idade} anos • ` : ""}
+                  {paciente.sexo ? `${paciente.sexo} • ` : ""}
+                  CPF: {paciente.cpf}
                 </p>
               </div>
             </div>
 
             <div className="flex flex-col items-end mt-4 md:mt-0">
               <span className="text-green-400 font-medium">Ativo</span>
-              <span className="text-gray-400 text-sm">Última consulta: 15/10/2024</span>
+              <span className="text-gray-400 text-sm">
+                Última atualização: {new Date(paciente.updatedAt).toLocaleDateString("pt-BR")}
+              </span>
             </div>
           </div>
 
-          {/* Seções principais */}
+          {/* Informações */}
           <div className="grid md:grid-cols-2 gap-8">
-            {/* Informações de Contato */}
+            {/* Contato */}
             <div className="bg-[#111827] border border-[#1f2937] rounded-xl p-6 space-y-4">
               <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                 <ShieldCheck className="text-green-400" size={18} />
@@ -61,29 +94,28 @@ export default function PacienteDetalhes() {
               <div className="space-y-3 text-sm">
                 <div className="bg-[#1e293b] rounded-lg p-3 flex items-center gap-3">
                   <Phone className="text-green-400" size={18} />
-                  <span>(11) 99999-8888</span>
+                  <span>{paciente.telefone || "Sem telefone cadastrado"}</span>
                 </div>
 
                 <div className="bg-[#1e293b] rounded-lg p-3 flex items-center gap-3">
                   <Mail className="text-green-400" size={18} />
-                  <span>maria.silva@email.com</span>
+                  <span>{paciente.email || "Sem e-mail informado"}</span>
                 </div>
 
                 <div className="bg-[#1e293b] rounded-lg p-3 flex items-start gap-3">
                   <MapPin className="text-green-400 mt-1" size={18} />
-                  <span>Rua das Flores, 123 - São Paulo, SP - 01234-567</span>
+                  <span>{paciente.endereco || "Sem endereço cadastrado"}</span>
                 </div>
               </div>
             </div>
 
-            {/* Controle de Vacinas */}
+            {/* Vacinas */}
             <div className="bg-[#111827] border border-[#1f2937] rounded-xl p-6 space-y-5">
               <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                 <Syringe className="text-green-400" size={18} />
                 Controle de Vacinas
               </h3>
 
-              {/* Botões de status */}
               <div className="flex flex-wrap gap-3">
                 <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm flex items-center gap-2">
                   <ShieldCheck size={16} /> Vacinas Tomadas
@@ -93,31 +125,23 @@ export default function PacienteDetalhes() {
                 </button>
               </div>
 
-              {/* Lista de vacinas */}
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center bg-[#1e293b] rounded-lg p-3">
-                  <div>
-                    <p className="text-white">COVID-19 (Pfizer)</p>
-                    <p className="text-gray-400 text-xs">3ª dose</p>
+                {(paciente.vacinas || []).map((v, i) => (
+                  <div
+                    key={i}
+                    className="flex justify-between items-center bg-[#1e293b] rounded-lg p-3"
+                  >
+                    <div>
+                      <p className="text-white">{v.nome}</p>
+                      <p className="text-gray-400 text-xs">{v.dose}</p>
+                    </div>
+                    <span className="text-gray-400">{v.data}</span>
                   </div>
-                  <span className="text-gray-400">15/03/2024</span>
-                </div>
+                ))}
 
-                <div className="flex justify-between items-center bg-[#1e293b] rounded-lg p-3">
-                  <div>
-                    <p className="text-white">Influenza</p>
-                    <p className="text-gray-400 text-xs">Anual 2024</p>
-                  </div>
-                  <span className="text-gray-400">10/04/2024</span>
-                </div>
-
-                <div className="flex justify-between items-center bg-[#1e293b] rounded-lg p-3">
-                  <div>
-                    <p className="text-white">Tétano/Difteria</p>
-                    <p className="text-gray-400 text-xs">Reforço</p>
-                  </div>
-                  <span className="text-gray-400">22/01/2024</span>
-                </div>
+                {(!paciente.vacinas || paciente.vacinas.length === 0) && (
+                  <p className="text-gray-400 text-sm">Nenhuma vacina registrada.</p>
+                )}
               </div>
             </div>
           </div>
