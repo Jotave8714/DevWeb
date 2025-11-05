@@ -2,6 +2,29 @@ import User from '../models/User.js';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+
+// 🟢 Login (novo)
+export const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
+
+    const senhaCorreta = await bcrypt.compare(password, user.password);
+    if (!senhaCorreta) return res.status(401).json({ error: "Senha incorreta" });
+
+    // (sem JWT por enquanto, só retorno simples)
+    return res.json({
+      message: "Login realizado com sucesso!",
+      user: { id: user._id, nome: user.nome, email: user.email },
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+
 export const createUser = async (req, res) => {
   try {
     const { password, ...rest } = req.body;
