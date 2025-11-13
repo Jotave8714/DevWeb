@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
-import { Syringe, CheckCircle, Clock, Calendar, Plus } from "lucide-react";
+import { Syringe, CheckCircle, Clock, Calendar, Plus, Edit, Trash2 } from "lucide-react";
 import ModalNovaVacina from "../components/ModalNovaVacina";
 import API from "../api";
+import { useNavigate } from "react-router-dom";
 
 export default function Vacinas() {
   const [showModal, setShowModal] = useState(false);
   const [vacinas, setVacinas] = useState([]);
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const navigate = useNavigate();
 
   // 🔄 Buscar vacinas do backend
   const fetchVacinas = async () => {
@@ -28,6 +31,23 @@ export default function Vacinas() {
   const ativas = vacinas.filter((v) => v.status === "Ativa").length;
   const vencendo = vacinas.filter((v) => v.status === "Vencendo").length;
   const inativas = vacinas.filter((v) => v.status === "Inativa").length;
+
+  // Função para excluir vacina
+  const handleDelete = async (id) => {
+    if (window.confirm("Tem certeza que deseja excluir esta vacina?")) {
+      try {
+        await API.delete(`/vacinas/${id}`);
+        setVacinas((prev) => prev.filter((v) => v._id !== id));
+      } catch (err) {
+        alert("Erro ao excluir vacina.");
+      }
+    }
+  };
+
+  // Função para editar vacina (navega para página de edição)
+  const handleEdit = (id) => {
+    navigate(`/vacinas/editar/${id}`);
+  };
 
   return (
     <div className="flex min-h-screen bg-[#0b1120] text-gray-200">
@@ -72,9 +92,9 @@ export default function Vacinas() {
                   <th className="py-3 px-4 text-left">Intervalo (dias)</th>
                   <th className="py-3 px-4 text-left">Público</th>
                   <th className="py-3 px-4 text-left">Status</th>
+                  <th className="py-3 px-4 text-center">Ações</th>
                 </tr>
               </thead>
-
               <tbody>
                 {vacinas.length > 0 ? (
                   vacinas.map((v) => (
@@ -82,9 +102,7 @@ export default function Vacinas() {
                       key={v._id}
                       className="border-t border-[#1f2937] hover:bg-[#1a2333] transition"
                     >
-                      <td className="py-3 px-4 font-medium text-white">
-                        {v.nome || "—"}
-                      </td>
+                      <td className="py-3 px-4 font-medium text-white">{v.nome || "—"}</td>
                       <td className="py-3 px-4">{v.fabricante || "—"}</td>
                       <td className="py-3 px-4">{v.lote || "—"}</td>
                       <td className="py-3 px-4">
@@ -106,14 +124,32 @@ export default function Vacinas() {
                       >
                         {v.status || "—"}
                       </td>
+                      <td className="py-3 px-4 text-center flex justify-center gap-4">
+                        {/* Só mostra editar/excluir se for admin */}
+                        {user.tipo === "admin" && (
+                          <>
+                            <button
+                              onClick={() => handleEdit(v._id)}
+                              className="text-gray-400 hover:text-green-400"
+                              title="Editar"
+                            >
+                              <Edit size={18} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(v._id)}
+                              className="text-gray-400 hover:text-red-400"
+                              title="Excluir"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </>
+                        )}
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td
-                      colSpan="8"
-                      className="text-center py-4 text-gray-400"
-                    >
+                    <td colSpan="9" className="text-center py-4 text-gray-400">
                       Nenhuma vacina cadastrada.
                     </td>
                   </tr>
@@ -123,13 +159,15 @@ export default function Vacinas() {
           </div>
         </main>
 
-        {/* ➕ Botão flutuante */}
-        <button
-          onClick={() => setShowModal(true)}
-          className="fixed bottom-8 right-8 bg-green-500 hover:bg-green-600 text-white flex items-center gap-2 px-5 py-3 rounded-full shadow-lg transition duration-300"
-        >
-          <Plus size={20} /> Nova Vacina
-        </button>
+        {/* ➕ Botão flutuante só para admin */}
+        {user.tipo === "admin" && (
+          <button
+            onClick={() => setShowModal(true)}
+            className="fixed bottom-8 right-8 bg-green-500 hover:bg-green-600 text-white flex items-center gap-2 px-5 py-3 rounded-full shadow-lg transition duration-300"
+          >
+            <Plus size={20} /> Nova Vacina
+          </button>
+        )}
       </div>
 
       {/* Modal funcional */}

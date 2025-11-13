@@ -17,7 +17,7 @@ export const loginUser = async (req, res) => {
     // (sem JWT por enquanto, só retorno simples)
     return res.json({
       message: "Login realizado com sucesso!",
-      user: { id: user._id, nome: user.nome, email: user.email },
+      user: { id: user._id, nome: user.nome, email: user.email, tipo: user.tipo },
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });

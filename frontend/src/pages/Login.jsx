@@ -7,7 +7,7 @@ import API from "../api"; // ✅ conexão com backend
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({ email: "", password: "" , tipo: ""});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,8 +26,9 @@ export default function Login() {
     try {
       const res = await API.post("/users/login", formData);
       localStorage.setItem("user", JSON.stringify(res.data.user)); // salva login local
+      console.log("Usuário retornado:", res.data.user); // <-- debug
       alert("✅ Login realizado com sucesso!");
-      navigate("/dashboard");
+      res.data.user.tipo === "admin" ? navigate("/admin") : navigate("/dashboard");
     } catch (err) {
       console.error("Erro ao logar:", err);
       alert("❌ E-mail ou senha incorretos.");

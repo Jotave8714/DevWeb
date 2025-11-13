@@ -9,6 +9,8 @@ export default function Pacientes() {
   const navigate = useNavigate();
   const [pacientes, setPacientes] = useState([]);
 
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
   // 🔄 Busca os pacientes ao montar o componente
   useEffect(() => {
     const fetchPacientes = async () => {
@@ -27,7 +29,7 @@ export default function Pacientes() {
     if (window.confirm("Tem certeza que deseja excluir este paciente?")) {
       try {
         // 👇 Substitua o endpoint abaixo pelo correto da sua API
-        await API.delete(`/pacientes/${id}`); 
+        await API.delete(`/pacientes/${id}`);
 
         // Atualiza a lista local após exclusão
         setPacientes((prev) => prev.filter((p) => p._id !== id));
@@ -74,18 +76,23 @@ export default function Pacientes() {
                         >
                           <Eye size={18} />
                         </button>
-                        <button
-                          onClick={() => navigate(`/pacientes/editar/${p._id}`)}
-                          className="text-gray-400 hover:text-green-400"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(p._id)}
-                          className="text-gray-400 hover:text-red-400"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                        {/* Só mostra editar/excluir se NÃO for funcionario */}
+                        {user.tipo !== "funcionario" && (
+                          <>
+                            <button
+                              onClick={() => navigate(`/pacientes/editar/${p._id}`)}
+                              className="text-gray-400 hover:text-green-400"
+                            >
+                              <Edit size={18} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(p._id)}
+                              className="text-gray-400 hover:text-red-400"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </>
+                        )}
                       </td>
                     </tr>
                   ))

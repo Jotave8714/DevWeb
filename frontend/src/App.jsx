@@ -9,6 +9,9 @@ import CadastroPaciente from "./pages/CadastroPaciente";
 import Vacinas from "./pages/Vacinas";
 import PacienteDetalhes from "./pages/PacienteDetalhes";
 import EditarPaciente from "./pages/EditarPaciente";
+import AdminDashboard from "./pages/AdminDashboard";
+import Funcionarios from "./pages/Funcionarios";
+import EditarVacina from "./pages/EditarVacina"; // <-- adicione esta linha
 
 export default function App() {
   return (
@@ -23,6 +26,9 @@ export default function App() {
         <Route path="/pacientes/detalhes/:id" element={<PacienteDetalhes />} /> {/* ✅ dinâmica */}
         <Route path="/pacientes/editar/:id" element={<EditarPaciente />} /> {/* ✅ dinâmica */}
         <Route path="/vacinas" element={<Vacinas />} />
+        <Route path="/vacinas/editar/:id" element={<EditarVacina />} /> {/* <-- nova rota */}
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/funcionarios" element={<Funcionarios />} /> {/* <-- nova rota */}
       </Routes>
     </Router>
   );
