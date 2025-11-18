@@ -6,6 +6,8 @@ import vacinasRouter from './routes/vacinas.js';
 import pacientesRouter from './routes/pacientes.js';
 import usersRouter from './routes/users.js';
 
+
+
 dotenv.config();
 
 const app = express();
@@ -21,6 +23,7 @@ connectDB();
 app.use('/api/vacinas', vacinasRouter);
 app.use('/api/pacientes', pacientesRouter);
 app.use('/api/users', usersRouter);
+
 
 app.get('/', (req, res) => res.send('API rodando'));
 

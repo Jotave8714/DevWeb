@@ -1,36 +1,50 @@
 // src/components/Sidebar.jsx
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
   Syringe,
   ClipboardList,
   Database,
-  Activity,
-  BarChart3,
-  Calendar,
-  AlertCircle,
-  HelpCircle,
   LogOut,
 } from "lucide-react";
 
-const menuItems = [
-  { name: "Início", icon: <LayoutDashboard size={18} />, path: "/dashboard" },
-  { name: "Pacientes", icon: <Users size={18} />, path: "/pacientes" },
-  { name: "Registro de Vacinas", icon: <Syringe size={18} />, path: "/vacinas" },
-  { name: "Esquemas de doses", icon: <ClipboardList size={18} />, path: "/doses" },
-  { name: "Estoques e lotes", icon: <Database size={18} />, path: "/estoques" },
-  { name: "Rastreabilidade", icon: <Activity size={18} />, path: "/rastreabilidade" },
-  { name: "Relatórios", icon: <BarChart3 size={18} />, path: "/relatorios" },
-  { name: "Central de Ajuda", icon: <HelpCircle size={18} />, path: "/ajuda" },
-];
-
 export default function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const cargo = user.tipo === "admin" ? "Administrador" : "Funcionário";
+
+  const logout = () => {
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
+  // 🔥 Aqui você define o link correto para o dashboard certo:
+  const dashboardPath = user.tipo === "admin" ? "/admin" : "/dashboard";
+
+  // 🔥 Menu dinâmico
+  const menuItems = [
+    { name: "Início", icon: <LayoutDashboard size={18} />, path: dashboardPath },
+    { name: "Pacientes", icon: <Users size={18} />, path: "/pacientes" },
+    { name: "Registro de Vacinas", icon: <Syringe size={18} />, path: "/vacinas" },
+    { name: "Esquemas de doses", icon: <ClipboardList size={18} />, path: "/doses" },
+  ];
+
+  // 🔥 Somente ADMIN pode ver /funcionarios
+  if (user.tipo === "admin") {
+    menuItems.push({
+      name: "Funcionários",
+      icon: <Users size={18} />,
+      path: "/funcionarios"
+    });
+  }
 
   return (
     <aside className="w-64 bg-[#0f172a] text-gray-200 flex flex-col min-h-screen border-r border-gray-800">
+
       {/* Logo */}
       <div className="p-6 flex items-center gap-3">
         <div className="bg-green-500 w-10 h-10 rounded-lg flex items-center justify-center text-white text-lg font-bold">
@@ -60,23 +74,17 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Usuário (rodapé) */}
+      {/* Rodapé usuário */}
       <div className="border-t border-gray-800 p-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/4140/4140037.png"
-            alt="User"
-            className="w-8 h-8 rounded-full"
-          />
-          <div>
-            <p className="text-sm font-semibold">Dr. João Silva</p>
-            <p className="text-xs text-gray-400">Administrador</p>
-          </div>
+        <div>
+          <p className="text-sm font-semibold">{user.nome || "Usuário"}</p>
+          <p className="text-xs text-gray-400">{cargo}</p>
         </div>
-        <button className="text-gray-400 hover:text-red-400">
+        <button onClick={logout} className="text-gray-400 hover:text-red-400">
           <LogOut size={18} />
         </button>
       </div>
+
     </aside>
   );
 }

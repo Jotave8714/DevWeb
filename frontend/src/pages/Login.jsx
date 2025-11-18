@@ -101,13 +101,13 @@ export default function Login() {
             <Lock size={18} />
             Entrar no sistema
           </button>
-
+{/* 
           <p className="text-center text-sm text-gray-400 mt-4">
             Não tem uma conta?{" "}
             <Link to="/cadastro" className="text-green-400 hover:underline">
               Cadastre-se
             </Link>
-          </p>
+          </p> */}
         </form>
       </div>
 

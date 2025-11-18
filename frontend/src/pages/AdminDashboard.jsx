@@ -1,17 +1,48 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import StatCard from "../components/StatCard";
 import { Users, Syringe, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import API from "../api";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
+  const [pacientes, setPacientes] = useState([]);
+  const [vacinas, setVacinas] = useState([]);
+
+  useEffect(() => {
+    loadPacientes();
+    loadVacinas();
+  }, []);
+
+  const loadPacientes = async () => {
+    try {
+      const res = await API.get("/pacientes");
+      setPacientes(res.data);
+    } catch (err) {
+      console.error("Erro ao buscar pacientes:", err);
+    }
+  };
+
+  const loadVacinas = async () => {
+    try {
+      const res = await API.get("/vacinas");
+      setVacinas(res.data);
+    } catch (err) {
+      console.error("Erro ao buscar vacinas:", err);
+    }
+  };
+
+  // Contadores
+  const totalPacientes = pacientes.length;
+  const totalVacinas = vacinas.length;
+  const estoqueBaixo = vacinas.filter(v => v.doses < 10).length;
+
   return (
     <div className="flex min-h-screen bg-[#0b1120] text-gray-200">
       <Sidebar />
-
       <div className="flex-1 flex flex-col">
         <Header />
 
@@ -19,44 +50,49 @@ export default function AdminDashboard() {
           {/* Banner */}
           <div className="bg-green-600 text-white rounded-lg p-5 flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-semibold">Bem-vindo de volta!</h3>
+              <h3 className="text-lg font-semibold">Bem-vindo!</h3>
               <p className="text-sm text-green-100">
-                Gerencie vacinas e pacientes de forma eficiente.
+                Gerencie vacinas, pacientes e funcionários.
               </p>
             </div>
             <span className="text-3xl">🛡️</span>
           </div>
 
-          {/* Estatísticas + Ações */}
+          {/* Estatísticas */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
             <StatCard
               title="Total de Pacientes"
-              value="1,247"
-              trend="+12% este mês"
+              value={totalPacientes}
               icon={<Users size={18} />}
               color="bg-green-500/20 text-green-400"
             />
+
             <StatCard
-              title="Vacinas Aplicadas"
-              value="3,892"
-              trend="+8% esta semana"
+              title="Vacinas Cadastradas"
+              value={totalVacinas}
               icon={<Syringe size={18} />}
               color="bg-green-500/20 text-green-400"
             />
+
             <StatCard
               title="Estoque Baixo"
-              value="3"
+              value={estoqueBaixo}
               trend="Requer atenção"
               icon={<AlertTriangle size={18} />}
               color="bg-red-500/20 text-red-400"
             />
+          </div>
+
+          {/* Ações */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
 
             {/* Gerenciar Pacientes */}
             <div className="bg-[#1e293b] p-5 rounded-lg text-center">
               <div className="text-green-400 text-3xl mb-2">👥</div>
               <h4 className="font-semibold mb-1">Gerenciar Pacientes</h4>
               <p className="text-sm text-gray-400 mb-3">
-                Visualize e gerencie informações dos pacientes
+                Controle completo de pacientes.
               </p>
               <button
                 onClick={() => navigate("/pacientes")}
@@ -66,39 +102,27 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            {/* Registrar Vacina */}
+            {/* Vacinas */}
             <div className="bg-[#1e293b] p-5 rounded-lg text-center">
               <div className="text-green-400 text-3xl mb-2">💉</div>
-              <h4 className="font-semibold mb-1">Registrar Vacina</h4>
+              <h4 className="font-semibold mb-1">Gerenciar Vacinas</h4>
               <p className="text-sm text-gray-400 mb-3">
-                Registre uma nova aplicação de vacina
+                Controle de estoque e registros.
               </p>
               <button
-                onClick={() => navigate("/vacinas", { state: { openModal: true } })}
+                onClick={() => navigate("/vacinas")}
                 className="bg-green-500 hover:bg-green-600 text-white text-sm py-1.5 px-4 rounded-md"
               >
-                Novo Registro
+                Acessar Vacinas
               </button>
             </div>
 
-            {/* Perfil */}
-            <div className="bg-[#1e293b] p-5 rounded-lg text-center">
-              <div className="text-green-400 text-3xl mb-2">👤</div>
-              <h4 className="font-semibold mb-1">Meu Perfil</h4>
-              <p className="text-sm text-gray-400 mb-3">
-                Gerencie suas informações pessoais
-              </p>
-              <button className="bg-green-500 hover:bg-green-600 text-white text-sm py-1.5 px-4 rounded-md">
-                Ver Perfil
-              </button>
-            </div>
-
-            {/* Gerenciar Funcionários */}
+            {/* Funcionários */}
             <div className="bg-[#1e293b] p-5 rounded-lg text-center">
               <div className="text-green-400 text-3xl mb-2">🧑‍⚕️</div>
-              <h4 className="font-semibold mb-1">Gerenciar Funcionários</h4>
+              <h4 className="font-semibold mb-1">Funcionários</h4>
               <p className="text-sm text-gray-400 mb-3">
-                Visualize e gerencie informações dos funcionários
+                Cadastre, edite e remova funcionários.
               </p>
               <button
                 onClick={() => navigate("/funcionarios")}
@@ -107,7 +131,9 @@ export default function AdminDashboard() {
                 Acessar Funcionários
               </button>
             </div>
+
           </div>
+
         </main>
       </div>
     </div>

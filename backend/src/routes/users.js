@@ -14,23 +14,12 @@ import * as userCtrl from "../controllers/UserController.js";
 
 const router = express.Router();
 
-// 🟢 Cadastro de usuário
 router.post("/register", userCtrl.createUser);
-
-// 🔑 Login de usuário
-router.post("/login", userCtrl.loginUser); // 👈 precisa adicionar essa função no controller
-
-// 📋 Listar todos
+router.post("/login", userCtrl.loginUser);
 router.get("/", userCtrl.getUsers);
-
-// 🔍 Buscar por ID
 router.get("/:id", userCtrl.getUserById);
-
-// ✏️ Atualizar
 router.put("/:id", userCtrl.updateUser);
-
-// ❌ Excluir
 router.delete("/:id", userCtrl.deleteUser);
 
-
 export default router;
+

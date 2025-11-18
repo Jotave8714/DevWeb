@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api", // URL do seu backend
+  baseURL: "http://localhost:3001/api", // URL do seu backend
 });
 
 // 🔒 Intercepta erros para debug
