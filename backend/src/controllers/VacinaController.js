@@ -55,3 +55,20 @@ export const deleteVacina = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
+
+export const createManyVacinas = async (req, res) => {
+  try {
+    const vacinas = req.body;
+
+    if (!Array.isArray(vacinas)) {
+      return res.status(400).json({ error: "O corpo da requisição deve ser um array de vacinas." });
+    }
+
+    const inserted = await Vacina.insertMany(vacinas, { ordered: false });
+
+    return res.status(201).json(inserted);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+};
+

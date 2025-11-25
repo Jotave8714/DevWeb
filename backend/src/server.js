@@ -5,15 +5,17 @@ import connectDB from './config/db.js';
 import vacinasRouter from './routes/vacinas.js';
 import pacientesRouter from './routes/pacientes.js';
 import usersRouter from './routes/users.js';
+import reportsRouter from './routes/reports.js';
 
 
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// permite o frontend (ajuste FRONTEND_ORIGIN no .env se necessário)
+app.use(cors({ origin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173' }));
 app.use(express.json());
 
 // conectar ao banco
@@ -23,6 +25,8 @@ connectDB();
 app.use('/api/vacinas', vacinasRouter);
 app.use('/api/pacientes', pacientesRouter);
 app.use('/api/users', usersRouter);
+// monta a rota de relatórios no mesmo servidor principal
+app.use('/api/reports', reportsRouter);
 
 
 app.get('/', (req, res) => res.send('API rodando'));
@@ -30,6 +34,8 @@ app.get('/', (req, res) => res.send('API rodando'));
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
+
+
 // import express from "express";
 // import cors from "cors";
 // import dotenv from "dotenv";
