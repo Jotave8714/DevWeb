@@ -85,7 +85,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Ações */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-3">
 
             {/* Gerenciar Pacientes */}
             <div className="bg-[#1e293b] p-5 rounded-lg text-center">
@@ -129,6 +129,22 @@ export default function AdminDashboard() {
                 className="bg-green-500 hover:bg-green-600 text-white text-sm py-1.5 px-4 rounded-md"
               >
                 Acessar Funcionários
+              </button>
+            </div>
+
+            {/* Novo: Atalho para Relatórios */}
+            <div
+              className="bg-[#1e293b] p-5 rounded-lg text-center cursor-pointer hover:shadow-md"
+              onClick={() => navigate("/relatorios")}
+            >
+              <div className="text-green-400 text-3xl mb-2">📊</div>
+              <h4 className="font-semibold mb-1">Relatórios</h4>
+              <p className="text-sm text-gray-400 mb-3">Análises por idade e vencimento</p>
+              <button
+                onClick={(e) => { e.stopPropagation(); navigate("/relatorios"); }}
+                className="bg-green-500 hover:bg-green-600 text-white text-sm py-1.5 px-4 rounded-md"
+              >
+                Abrir Relatórios
               </button>
             </div>
 

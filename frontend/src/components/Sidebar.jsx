@@ -31,6 +31,7 @@ export default function Sidebar() {
     { name: "Pacientes", icon: <Users size={18} />, path: "/pacientes" },
     { name: "Registro de Vacinas", icon: <Syringe size={18} />, path: "/vacinas" },
     { name: "Esquemas de doses", icon: <ClipboardList size={18} />, path: "/doses" },
+    { name: "Relatórios", icon: <Database size={18} />, path: "/relatorios" },
   ];
 
   // 🔥 Somente ADMIN pode ver /funcionarios
